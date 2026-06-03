@@ -1,0 +1,5 @@
+# Dependencias de desarrollo (test + lint). Incluye runtime.
+-r requirements.txt
+pytest==9.0.3
+pytest-django==4.12.0
+flake8==7.3.0
