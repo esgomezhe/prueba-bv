@@ -1,0 +1,39 @@
+# ===== Entorno =====
+.env
+.env.local
+*.env
+!.env.example
+
+# ===== Python / Django =====
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+staticfiles/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===== Node / Next.js (frontend, próximo) =====
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# ===== Editores / SO =====
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# ===== Docker =====
+*.pid
+
+# ===== Tooling interno / Docs =====
+.atl/
+.mcp.json
+docs/
