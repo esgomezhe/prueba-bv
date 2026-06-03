@@ -1,10 +1,12 @@
 # Sistema de Gestión de Citas de Entrega
 
+[![CI](https://github.com/esgomezhe/prueba-bv/actions/workflows/ci.yml/badge.svg)](https://github.com/esgomezhe/prueba-bv/actions/workflows/ci.yml)
+
 Aplicación fullstack para gestionar citas de entrega de mercancía en una empresa
 de retail textil: **backend** (Django REST Framework), **base de datos**
 (Supabase/PostgreSQL) y **frontend** (Next.js).
 
-> Estado actual: **Backend** ✅ · **Base de datos** ✅ · **Frontend** ✅ · **Docker Compose** ✅ · CI/CD ⏳
+> Estado actual: **Backend** ✅ · **Base de datos** ✅ · **Frontend** ✅ · **Docker Compose** ✅ · **CI/CD** ✅
 
 ## Inicio rápido (Docker) — un solo comando
 
@@ -368,6 +370,11 @@ Y recuerda ejecutar `python manage.py harden_rls` una vez sobre Supabase (ver §
 
 ---
 
-## 12. Próximos pasos
+## 12. Integración Continua (CI)
 
-- [ ] CI/CD GitHub Actions (lint backend Flake8 + lint frontend ESLint) — BONUS.
+GitHub Actions corre en cada push a `main`/`feature/**` y en cada PR a `main`
+([workflow](.github/workflows/ci.yml)):
+
+- **Backend**: Flake8 + pytest sobre un servicio PostgreSQL 16 (incluye las
+  pruebas del reporte en SQL nativo).
+- **Frontend**: ESLint + verificación de tipos + Vitest + build de producción.
