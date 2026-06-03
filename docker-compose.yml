@@ -1,0 +1,61 @@
+# Stack completo: base de datos + backend + frontend.
+# Levantar con un solo comando:  docker compose up --build
+#
+# Por defecto usa un PostgreSQL LOCAL auto-contenido (sin secretos), para que
+# cualquiera pueda levantarlo. Para usar Supabase en su lugar, ver el README
+# (sección Docker): basta sobreescribir DATABASE_URL del servicio backend.
+
+services:
+  db:
+    image: postgres:16-alpine
+    # Credenciales LOCALES, no secretas (BD efímera en contenedor). Fijas a
+    # propósito para que el stack sea reproducible e independiente del .env.
+    environment:
+      POSTGRES_DB: citas_entrega
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: changeme
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d citas_entrega"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+      # SECRET_KEY se toma del entorno si existe; si no, default inseguro de
+      # demo (NO usar en producción real).
+      SECRET_KEY: ${SECRET_KEY:-django-insecure-demo-key-cambiar-en-produccion}
+      ALLOWED_HOSTS: localhost,127.0.0.1,backend
+      DATABASE_URL: postgres://app_user:changeme@db:5432/citas_entrega
+      CORS_ALLOWED_ORIGINS: http://localhost:${FRONTEND_PORT:-3000}
+      DJANGO_SECURE_COOKIES: "False"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # Solo para acceder a Swagger/admin desde el host. Cambia BACKEND_PORT si
+      # el 8000 está ocupado:  BACKEND_PORT=8001 docker compose up
+      - "${BACKEND_PORT:-8000}:8000"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    environment:
+      # URL interna de Django (red de Docker). El navegador NO la usa: solo el
+      # proxy server-side de Next (patrón BFF).
+      DJANGO_API_URL: http://backend:8000/api
+      # HTTP local: cookies sin Secure para que el navegador las envíe.
+      COOKIE_SECURE: "false"
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
